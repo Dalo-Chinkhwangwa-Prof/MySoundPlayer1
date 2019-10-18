@@ -25,7 +25,7 @@ class MyPlayerService : Service() {
     }
 
     private fun createNotification(): Notification {
-        var notification: Notification? = null
+        var notification: Notification?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel =
                 NotificationChannel(
@@ -65,14 +65,14 @@ class MyPlayerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
-        mediaPlayer.start()
+        mediaPlayer.reset()
         playPlayer()
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        notificationManager.cancel(1)
         sendBroadcast(Intent("com.my.sender").apply {
             this.putExtra("my_key", "STOPPED")
         })
@@ -90,7 +90,9 @@ class MyPlayerService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
+        notificationManager.cancel(1)
     }
+
     fun playPlayer() {
         if (!mediaPlayer.isPlaying) {
             mediaPlayer.start()
@@ -101,8 +103,14 @@ class MyPlayerService : Service() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        Log.d("TAG_X", "unBound!")
+        notificationManager.cancel(1)
+        sendBroadcast(Intent("com.my.sender").apply {
+            this.putExtra("my_key", "STOPPED")
+        })
         return true
     }
+
     inner class MyPlayerBinder : Binder() {
         fun getPlayerService(): MyPlayerService {
             return this@MyPlayerService

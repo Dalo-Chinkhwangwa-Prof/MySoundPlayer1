@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         play_button.setOnClickListener {
             myPlayerService?.playPlayer() ?: {
-                //startService(intent)
+                startService(intent)
                 bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
             }()
         }
@@ -60,10 +59,10 @@ class MainActivity : AppCompatActivity() {
                 myPlayerService = null
             }
 
-//            Log.d("TAG_X", "Service stopped.")
 //            stopService(intent) //will stop when we close.....
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(myReceiver)
